@@ -4,6 +4,9 @@ import Victory from "../../assets/victory.svg"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { apiClient } from "@/lib/app-client"
+import { LOGIN_ROUTE, SIGNUP_ROUTE } from '@/utils/constants'
 
 const Auth = () => {
 
@@ -11,12 +14,54 @@ const Auth = () => {
     const [password,setPassword]= useState("")
     const [confirmPassword,setConfirmPassword]= useState("")
 
-    const handleLogin = async () => {
+    const validateLogin = () => {
+        if(!email.length){
+            toast.error("Email is required.");
+            return false;
+        }
+        if(!password.length){
+            toast.error("Password is required.");
+            return false;
+        }
+        return true;
+    }
 
+    const validateSignup = () => {
+        if(!email.length){
+            toast.error("Email is required.");
+            return false;
+        }
+        if(!password.length){
+            toast.error("Password is required.");
+            return false;
+        }
+        if(password !== confirmPassword){
+            toast.error("Password and Confirm Password should be same.");
+            return false;
+        }
+        return true;
+    }
+
+    const handleLogin = async () => {
+        if(validateLogin()){
+            const res = await apiClient.post(
+              LOGIN_ROUTE,
+              { email, password },
+              { withCredentials: true }
+            );
+            console.log({res});
+        }
     }
 
     const handleSignup = async () => {
-        
+        if(validateSignup()){
+            const res = await apiClient.post(
+              SIGNUP_ROUTE,
+              { email, password },
+              { withCredentials: true }
+            );
+            console.log({res});
+        }
     }
 
   return (
@@ -66,7 +111,7 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button className="rounded-full p-6" onClick={handleLogin}>Login</Button>
+                <Button className="bg-black hover:bg-gray-800 text-white rounded-full p-6" onClick={handleLogin}>Login</Button>
               </TabsContent>
               <TabsContent className="flex flex-col gap-5" value="signup">
               <Input
@@ -90,7 +135,7 @@ const Auth = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                <Button className="rounded-full p-6" onClick={handleSignup}>Signup</Button>
+                <Button className="bg-black hover:bg-gray-800 text-white rounded-full p-6" onClick={handleSignup}>Signup</Button>
               </TabsContent>
             </Tabs>
           </div>
